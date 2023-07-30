@@ -174,51 +174,16 @@ for attribute in attributes:
   information_gain = entropy(class_probabilities(inputs)) - entropy_split
   print(f"Information Gain '{attribute}': ", information_gain)
 
-
-
-
-
-
-
-
-
-
 # ---------------------------------------------------------
-# Test Tree Output using Iris Dataset
+# Tree Output
 # ---------------------------------------------------------
-# Code source: Gaël Varoquaux
-# Modified for documentation by Jaques Grobler
-# License: BSD 3 clause
-
-# import matplotlib.pyplot as plt
-# import pandas as pd
-# from sklearn import datasets, tree, preprocessing
-#
-# # Change to use data from panda
-# X = pd.DataFrame([vars(input) for input in inputs])
-# X = X.drop(['harga_sewa', 'kategori'], axis=1)  # Drop the 'harga_sewa' and 'kategori' columns
-# y = [input.kategori for input in inputs]
-#
-#
-# le = preprocessing.LabelEncoder()
-# X['tipe_bangunan'] = le.fit_transform(X['tipe_bangunan'])
-# y_encoded = le.fit_transform(y)  # Convert the 'kategori' column to numerical values
-#
-#
-# model = tree.DecisionTreeClassifier()
-# model.fit(X, y)
-#
-# # Output decision tree
-# plt.figure(figsize=(15, 10))
-# tree.plot_tree(model, feature_names=list(X.columns), class_names=le.classes_, filled=True)
-# plt.show()
-
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn import tree, preprocessing
 
 
 # Compute the classifications and store them as instance variables
+# Alternative: use input.ukuran as int
 for input in inputs:
   input.ukuran_class = input.ukuran_classification()
   input.lantai_class = input.lantai_classification()
