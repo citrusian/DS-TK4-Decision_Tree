@@ -9,6 +9,8 @@ import csv
 class Candidate:
   def __init__(self, no, ukuran, lantai, tarif_internet, tipe_bangunan, harga_sewa, kategori):
     self.no = int(no)
+    self.tipe_bangunan = tipe_bangunan
+    self.kategori = kategori
 
     # Call classification saat init value, namun hasil output berbeda.
     # namun saya kurang paham value mana yang benar
@@ -18,49 +20,51 @@ class Candidate:
     # When calling    ukuran_classification(ukuran) : Entropy Split 'ukuran':  1.4854752972273344
     #                                                 Information Gain 'ukuran':  1.8364527976600278
     # ------------------------------------------------------------------------------------------------
-    # self.ukuran = int(ukuran)
-    self.ukuran = self.ukuran_classification(ukuran)
-    self.lantai = self.lantai_classification(lantai)
-    self.tarif_internet = self.tarif_internet_classification(tarif_internet)
-    self.tipe_bangunan = tipe_bangunan
-    self.harga_sewa = self.harga_sewa_classification(harga_sewa)
-    self.kategori = kategori
+    self.ukuran = int(ukuran)
+    self.lantai = int(lantai)
+    self.tarif_internet = int(tarif_internet)
+    self.harga_sewa = int(harga_sewa)
 
-  def ukuran_classification(self, ukuran):
+    # self.ukuran = self.ukuran_classification()
+    # self.lantai = self.lantai_classification()
+    # self.tarif_internet = self.tarif_internet_classification()
+    # self.harga_sewa = self.harga_sewa_classification()
+
+  def ukuran_classification(self):
     # ukuran = self.ukuran
-    if ukuran <= 200:
+    if self.ukuran <= 200:
       return "kecil"
-    elif 200 < ukuran <= 350:
+    elif 200 < self.ukuran <= 350:
       return "sedang"
     else:
       return "besar"
 
-  def lantai_classification(self, lantai):
+  def lantai_classification(self):
     # lantai = self.lantai
-    if lantai <= 4:
+    if self.lantai <= 4:
       return "rendah"
-    elif 4 < lantai <= 8:
+    elif 4 < self.lantai <= 8:
       return "sedang"
     else:
       return "tinggi"
 
-  def tarif_internet_classification(self, tarif_internet):
+  def tarif_internet_classification(self):
     # tarif_internet = self.tarif_internet
-    if tarif_internet <= 8:
-      return "rendah"
-    elif 8 < tarif_internet <= 50:
-      return "sedang"
+    if self.tarif_internet <= 8:
+      return "SohoA"
+    elif 8 < self.tarif_internet <= 50:
+      return "SohoB"
     else:
-      return "tinggi"
+      return "SohoC"
 
-  def harga_sewa_classification(self, harga_sewa):
+  def harga_sewa_classification(self):
     # harga_sewa = self.harga_sewa
-    if harga_sewa <= 400:
-      return "rendah"
-    elif 400 < harga_sewa <= 550:
-      return "sedang"
+    if self.harga_sewa <= 400:
+      return "murah"
+    elif 400 < self.harga_sewa <= 550:
+      return "menengah"
     else:
-      return "tinggi"
+      return "mahal"
 
 
 # Use Data.csv for Candidate Objects
@@ -173,6 +177,12 @@ for attribute in attributes:
 
 
 
+
+
+
+
+
+
 # ---------------------------------------------------------
 # Test Tree Output using Iris Dataset
 # ---------------------------------------------------------
@@ -180,28 +190,92 @@ for attribute in attributes:
 # Modified for documentation by Jaques Grobler
 # License: BSD 3 clause
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
+# import pandas as pd
+# from sklearn import datasets, tree, preprocessing
+#
+# # Change to use data from panda
+# X = pd.DataFrame([vars(input) for input in inputs])
+# X = X.drop(['harga_sewa', 'kategori'], axis=1)  # Drop the 'harga_sewa' and 'kategori' columns
+# y = [input.kategori for input in inputs]
+#
+#
+# le = preprocessing.LabelEncoder()
+# X['tipe_bangunan'] = le.fit_transform(X['tipe_bangunan'])
+# y_encoded = le.fit_transform(y)  # Convert the 'kategori' column to numerical values
+#
+#
+# model = tree.DecisionTreeClassifier()
+# model.fit(X, y)
+#
+# # Output decision tree
+# plt.figure(figsize=(15, 10))
+# tree.plot_tree(model, feature_names=list(X.columns), class_names=le.classes_, filled=True)
+# plt.show()
+
 import pandas as pd
-from sklearn import datasets, tree
-
-# Change to use data from panda
-iris = datasets.load_iris()
-df = pd.DataFrame(iris.data, columns=iris.feature_names)
-df['target'] = iris.target_names[iris.target]
+import matplotlib.pyplot as plt
+from sklearn import tree, preprocessing
 
 
-X = df.drop('target', axis=1)
-y = df['target']
+# Compute the classifications and store them as instance variables
+for input in inputs:
+  input.ukuran_class = input.ukuran_classification()
+  input.lantai_class = input.lantai_classification()
+  input.tarif_internet_class = input.tarif_internet_classification()
+  input.harga_sewa_class = input.harga_sewa_classification()
 
+# Create a DataFrame with the data and target labels
+data = {
+  'ukuran': [input.ukuran_class for input in inputs],
+  'lantai': [input.lantai_class for input in inputs],
+  'tarif_internet': [input.tarif_internet_class for input in inputs],
+  'tipe_bangunan': [input.tipe_bangunan for input in inputs],
+  'harga_sewa': [input.harga_sewa_class for input in inputs],
+  # Cannot accept string, so use target labels
+  # 'kategori': ['Biasa', 'Biasa', 'VIP', 'Biasa', 'Biasa', 'VIP', 'VIP', 'Eksklusif', 'Eksklusif', 'Eksklusif'],
+  # ??? tidak tahu tiba tiba bisa menggunakan input ???
+  'kategori': [input.kategori for input in inputs],
+}
+
+df = pd.DataFrame(data)
+
+# Perform label encoding on the categorical features
+label_encoders = {}
+for feature in ['ukuran', 'lantai', 'tarif_internet', 'tipe_bangunan', 'harga_sewa', 'kategori']:
+  label_encoders[feature] = preprocessing.LabelEncoder()
+  df[feature] = label_encoders[feature].fit_transform(df[feature])
+
+
+label_encoder = preprocessing.LabelEncoder()
+df['kategori'] = label_encoder.fit_transform(df['kategori'])
+
+# plot and Create tree model
+X = df.drop('kategori', axis=1)
+y = df['kategori']
 model = tree.DecisionTreeClassifier()
 model.fit(X, y)
 
-# Output decision tree
-plt.figure(figsize=(15, 10))
-tree.plot_tree(model, feature_names=list(X.columns), class_names=list(iris.target_names), filled=True)
-plt.show()
+# Output Decision Tree
+plt.figure(figsize=(15, 20))
+# tree.plot_tree(model, feature_names=list(X.columns), class_names=label_encoders['kategori'].classes_, filled=True)
+# Fix use static value
+# tree.plot_tree(model, feature_names=list(X.columns), class_names=['Biasa', 'Eksklusif', 'VIP'], filled=True)
+# alt, use as list
+tree.plot_tree(model, feature_names=list(X.columns), class_names=list(label_encoders['kategori'].classes_), filled=True)
+# tree.plot_tree(model, feature_names=list(X.columns), class_names=list(label_encoder.classes_), filled=True)
 
 plt.show()
+
+
+
+
+
+
+
+
+
+
 
 
 
