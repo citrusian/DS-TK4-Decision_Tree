@@ -1,10 +1,11 @@
-No,Ukuran,Lantai,Tarif Internet,Tipe Bangunan,Harga Sewa
-1,510,4,8,C,320
-2,550,7,50,A,385
-3,620,9,7,C,400
-4,630,5,24,B,392
-5,655,8,100,A,380
-6,700,4,8,C,410
-7,780,10,7,C,480
-8,800,12,50,A,600
-9,920,14,8,C,570
+No,Ukuran,Lantai,Tarif Internet,Tipe Bangunan,Harga Sewa,Kategori
+1,510,4,8,C,320,Biasa
+2,550,7,50,A,385,Biasa
+3,620,9,7,C,400,VIP
+4,630,5,24,B,392,Biasa
+5,655,8,100,A,380,Biasa
+6,700,4,8,C,410,VIP
+7,780,10,7,C,480,VIP
+8,800,12,50,A,600,Eksklusif
+9,920,14,8,C,570,Eksklusif
+10,1000,9,24,B,620,Eksklusif

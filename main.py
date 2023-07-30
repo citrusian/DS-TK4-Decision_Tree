@@ -3,7 +3,84 @@ from collections import defaultdict, Counter
 import math
 # Streamline all import
 import csv
-# use CSV as data source
+
+# Define Candidate
+class Candidate:
+  def __init__(self, no, ukuran, lantai, tarif_internet, tipe_bangunan, harga_sewa, kategori):
+    self.no = int(no)
+    self.ukuran = int(ukuran)
+    self.lantai = int(lantai)
+    self.tarif_internet = int(tarif_internet)
+    self.tipe_bangunan = tipe_bangunan
+    self.harga_sewa = int(harga_sewa)
+    self.kategori = kategori
+
+
+  def ukuran_classification(self):
+    ukuran = self.ukuran
+    if ukuran <= 200:
+      return "kecil"
+    elif 200 < ukuran <= 350:
+      return "sedang"
+    else:
+      return "besar"
+
+  def lantai_classification(self):
+    lantai = self.lantai
+    if lantai <= 4:
+      return "rendah"
+    elif 4 < lantai <= 8:
+      return "sedang"
+    else:
+      return "tinggi"
+
+  def tarif_internet_classification(self):
+    tarif_internet = self.tarif_internet
+    if tarif_internet <= 8:
+      return "rendah"
+    elif 8 < tarif_internet <= 50:
+      return "sedang"
+    else:
+      return "tinggi"
+
+  def harga_sewa_classification(self):
+    harga_sewa = self.harga_sewa
+    if harga_sewa <= 400:
+      return "rendah"
+    elif 400 < harga_sewa <= 550:
+      return "sedang"
+    else:
+      return "tinggi"
+
+# Use Data.csv for Candidate Objects
+def read_data_from_csv(file_path: str) -> List[Candidate]:
+  candidates = []
+  with open(file_path, 'r', newline='') as csvfile:
+    reader = csv.DictReader(csvfile)
+    for row in reader:
+      candidate = Candidate(
+        no=row['No'],
+        ukuran=row['Ukuran'],
+        lantai=row['Lantai'],
+        tarif_internet=row['Tarif Internet'],
+        tipe_bangunan=row['Tipe Bangunan'],
+        harga_sewa=row['Harga Sewa'],
+        kategori=row['Kategori']  # Fix, katagori terlewat masuk csv
+      )
+      candidates.append(candidate)
+  return candidates
+
+# Read Data.csv as input
+data_file = "Data.csv"
+inputs = read_data_from_csv(data_file)
+
+
+
+
+
+
+
+
 
 
 def entropy(class_probabilities: List[float]) -> float:
