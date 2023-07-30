@@ -4,20 +4,30 @@ import math
 # Streamline all import
 import csv
 
+
 # Define Candidate
 class Candidate:
   def __init__(self, no, ukuran, lantai, tarif_internet, tipe_bangunan, harga_sewa, kategori):
     self.no = int(no)
-    self.ukuran = int(ukuran)
-    self.lantai = int(lantai)
-    self.tarif_internet = int(tarif_internet)
+
+    # Call classification saat init value, namun hasil output berbeda.
+    # namun saya kurang paham value mana yang benar
+    # -------------------------------------------- Output --------------------------------------------
+    # Without calling ukuran_classification(ukuran) : Entropy Split 'ukuran':  0.0
+    #                                                 Information Gain 'ukuran':  3.321928094887362
+    # When calling    ukuran_classification(ukuran) : Entropy Split 'ukuran':  1.4854752972273344
+    #                                                 Information Gain 'ukuran':  1.8364527976600278
+    # ------------------------------------------------------------------------------------------------
+    # self.ukuran = int(ukuran)
+    self.ukuran = self.ukuran_classification(ukuran)
+    self.lantai = self.lantai_classification(lantai)
+    self.tarif_internet = self.tarif_internet_classification(tarif_internet)
     self.tipe_bangunan = tipe_bangunan
-    self.harga_sewa = int(harga_sewa)
+    self.harga_sewa = self.harga_sewa_classification(harga_sewa)
     self.kategori = kategori
 
-
-  def ukuran_classification(self):
-    ukuran = self.ukuran
+  def ukuran_classification(self, ukuran):
+    # ukuran = self.ukuran
     if ukuran <= 200:
       return "kecil"
     elif 200 < ukuran <= 350:
@@ -25,8 +35,8 @@ class Candidate:
     else:
       return "besar"
 
-  def lantai_classification(self):
-    lantai = self.lantai
+  def lantai_classification(self, lantai):
+    # lantai = self.lantai
     if lantai <= 4:
       return "rendah"
     elif 4 < lantai <= 8:
@@ -34,8 +44,8 @@ class Candidate:
     else:
       return "tinggi"
 
-  def tarif_internet_classification(self):
-    tarif_internet = self.tarif_internet
+  def tarif_internet_classification(self, tarif_internet):
+    # tarif_internet = self.tarif_internet
     if tarif_internet <= 8:
       return "rendah"
     elif 8 < tarif_internet <= 50:
@@ -43,14 +53,15 @@ class Candidate:
     else:
       return "tinggi"
 
-  def harga_sewa_classification(self):
-    harga_sewa = self.harga_sewa
+  def harga_sewa_classification(self, harga_sewa):
+    # harga_sewa = self.harga_sewa
     if harga_sewa <= 400:
       return "rendah"
     elif 400 < harga_sewa <= 550:
       return "sedang"
     else:
       return "tinggi"
+
 
 # Use Data.csv for Candidate Objects
 def read_data_from_csv(file_path: str) -> List[Candidate]:
@@ -60,29 +71,25 @@ def read_data_from_csv(file_path: str) -> List[Candidate]:
     for row in reader:
       candidate = Candidate(
         no=row['No'],
-        ukuran=row['Ukuran'],
-        lantai=row['Lantai'],
-        tarif_internet=row['Tarif Internet'],
+        ukuran=int(row['Ukuran']),
+        lantai=int(row['Lantai']),
+        tarif_internet=int(row['Tarif Internet']),
         tipe_bangunan=row['Tipe Bangunan'],
-        harga_sewa=row['Harga Sewa'],
-        kategori=row['Kategori']  # Fix, katagori terlewat masuk csv
+        harga_sewa=int(row['Harga Sewa']),
+        kategori=row['Kategori']
       )
       candidates.append(candidate)
   return candidates
+
 
 # Read Data.csv as input
 data_file = "Data.csv"
 inputs = read_data_from_csv(data_file)
 
 
-
-
-
-
-
-
-
-
+# ---------------------------------------------------------
+# Modified Code from Jupyter decision_tree.ipynb
+# ---------------------------------------------------------
 def entropy(class_probabilities: List[float]) -> float:
   """Given a list of class probabilities, compute the entropy"""
   return sum(-p * math.log(p, 2)
@@ -95,7 +102,6 @@ assert entropy([0.5, 0.5]) == 1
 assert 0.81 < entropy([0.25, 0.75]) < 0.82
 
 
-
 def class_probabilities(labels: List[Any]) -> List[float]:
   total_count = len(labels)
   return [count / total_count
@@ -106,11 +112,13 @@ def data_entropy(labels: List[Any]) -> float:
   return entropy(class_probabilities(labels))
 
 
-assert data_entropy(['a']) == 0
-assert data_entropy([True, False]) == 1
-assert data_entropy([3, 4, 4, 4]) == entropy([0.25, 0.75])
+# # Output Class Entropy
+# print("Class Entropy: ", entropy(class_probabilities(inputs)))
 
-entropy(class_probabilities([4, 4, 4, 4]))
+# ---------------------------------------------------------
+# Split Attribute
+# ---------------------------------------------------------
+T = TypeVar('T')  # generic type for inputs
 
 
 def partition_entropy(subsets: List[List[Any]]) -> float:
@@ -121,44 +129,6 @@ def partition_entropy(subsets: List[List[Any]]) -> float:
              for subset in subsets)
 
 
-partition_entropy([[4, 4, 4, 4], [3, 2, 1]])
-
-
-
-
-
-
-
-
-class Candidate(NamedTuple):
-  level: str
-  lang: str
-  tweets: bool
-  phd: bool
-  did_well: Optional[bool] = None  # allow unlabeled data
-
-  #  level     lang     tweets  phd  did_well
-inputs = [Candidate('Senior', 'Java',   False, False, False),
-          Candidate('Senior', 'Java',   False, True,  False),
-          Candidate('Mid',    'Python', False, False, True),
-          Candidate('Junior', 'Python', False, False, True),
-          Candidate('Junior', 'R',      True,  False, True),
-          Candidate('Junior', 'R',      True,  True,  False),
-          Candidate('Mid',    'R',      True,  True,  True),
-          Candidate('Senior', 'Python', False, False, False),
-          Candidate('Senior', 'R',      True,  False, True),
-          Candidate('Junior', 'Python', True,  False, True),
-          Candidate('Senior', 'Python', True,  True,  True),
-          Candidate('Mid',    'Python', False, True,  True),
-          Candidate('Mid',    'Java',   True,  False, True),
-          Candidate('Junior', 'Python', False, True,  False)
-          ]
-
-
-
-
-T = TypeVar('T')  # generic type for inputs
-
 def partition_by(inputs: List[T], attribute: str) -> Dict[Any, List[T]]:
   """Partition the inputs into lists based on the specified attribute."""
   partitions: Dict[Any, List[T]] = defaultdict(list)
@@ -166,6 +136,7 @@ def partition_by(inputs: List[T], attribute: str) -> Dict[Any, List[T]]:
     key = getattr(input, attribute)  # value of the specified attribute
     partitions[key].append(input)    # add input to the correct partition
   return partitions
+
 
 def partition_entropy_by(inputs: List[Any],
                          attribute: str,
@@ -180,32 +151,24 @@ def partition_entropy_by(inputs: List[Any],
 
   return partition_entropy(labels)
 
-for key in ['level','lang','tweets','phd']:
-  print(key, partition_entropy_by(inputs, key, 'did_well'))
 
+# ---------------------------------------------------------
+# Output
+# ---------------------------------------------------------
+# Output Class Entropy
+print("Class Entropy: ", entropy(class_probabilities(inputs)))
 
+# Output Entropy Split
+attributes = ['ukuran', 'lantai', 'tarif_internet', 'tipe_bangunan', 'kategori']
+for attribute in attributes:
+  entropy_split = partition_entropy_by(inputs, attribute, 'harga_sewa')
+  print(f"Entropy Split '{attribute}': ", entropy_split)
 
-senior_inputs = [input for input in inputs if input.level == 'Senior']
-
-senior_inputs
-
-assert 0.4 == partition_entropy_by(senior_inputs, 'lang', 'did_well')
-assert 0.0 == partition_entropy_by(senior_inputs, 'tweets', 'did_well')
-assert 0.95 < partition_entropy_by(senior_inputs, 'phd', 'did_well') < 0.96
-
-junior_inputs = [input for input in inputs if input.level == 'Junior']
-
-for key in ['lang', 'tweets', 'phd']:
-  print(key, partition_entropy_by(junior_inputs, key, 'did_well'))
-
-
-
-
-
-
-
-
-
+# Information Gain
+for attribute in attributes:
+  entropy_split = partition_entropy_by(inputs, attribute, 'harga_sewa')
+  information_gain = entropy(class_probabilities(inputs)) - entropy_split
+  print(f"Information Gain '{attribute}': ", information_gain)
 
 
 
